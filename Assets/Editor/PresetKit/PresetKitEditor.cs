@@ -1,8 +1,7 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.Presets;
-using System.Collections.Generic;
-using System.IO;
+using UnityEngine;
 
 namespace PresetKit
 {
@@ -112,7 +111,6 @@ namespace PresetKit
             GUI.enabled = false;
             EditorGUILayout.TextField(rule.path);
             GUI.enabled = true;
-            rule.recursive = EditorGUILayout.ToggleLeft("Recursive", rule.recursive, GUILayout.Width(80));
             EditorGUILayout.EndHorizontal();
 
             //折叠的相关控件 返回bool类型表示开、关
@@ -129,14 +127,6 @@ namespace PresetKit
             GUI.color = Color.green;
             if (GUILayout.Button("Reimport"))
             {
-                if (rule.recursive)
-                {
-                    string[] subDirs = Directory.GetDirectories(rule.path);
-                    foreach (var subDir in subDirs)
-                    {
-                        AssetDatabase.ImportAsset(subDir, ImportAssetOptions.DontDownloadFromCacheServer | ImportAssetOptions.ImportRecursive);
-                    }
-                }
                 AssetDatabase.ImportAsset(rule.path, ImportAssetOptions.DontDownloadFromCacheServer | ImportAssetOptions.ImportRecursive);
             }
             GUI.color = origin;
@@ -149,9 +139,9 @@ namespace PresetKit
             EditorGUILayout.LabelField("Preset:", GUILayout.Width(40));
             rule.preset = (Preset)EditorGUILayout.ObjectField(rule.preset, typeof(Preset), false, GUILayout.Width(160));
             EditorGUILayout.LabelField("Regex:", GUILayout.Width(40));
-            rule.regex = EditorGUILayout.TextField(rule.regex);
+            rule.type = (EMatchType)EditorGUILayout.EnumPopup(rule.type, GUILayout.Width(70));
             EditorGUILayout.LabelField("Ext:", GUILayout.Width(25));
-            rule.extension = (AssetType)EditorGUILayout.EnumPopup(rule.extension, GUILayout.Width(70));
+            rule.pattern = EditorGUILayout.TextField(rule.pattern, GUILayout.Width(70));
             EditorGUILayout.EndHorizontal();
         }
 

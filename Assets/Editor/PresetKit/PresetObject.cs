@@ -12,9 +12,6 @@ namespace PresetKit
         [Tooltip("处理路径")]
         public string path;
 
-        [Tooltip("是否递归子文件夹")]
-        public bool recursive;
-
         [Tooltip("处理规则")]
         public PresetRule[] rules;
 
@@ -22,11 +19,11 @@ namespace PresetKit
         {
             if (rules != null)
             {
-                foreach (var preset in rules)
+                foreach (var rule in rules)
                 {
-                    if (preset.IsMatch(importer))
+                    if (rule.IsMatch(importer))
                     {
-                        return preset;
+                        return rule;
                     }
                 }
             }
@@ -43,11 +40,11 @@ namespace PresetKit
         }
     }
 
-    public enum AssetType
+
+    public enum EMatchType
     {
-        Png = 0,
-        Jpg = 1,
-        Prefab = 2,
+        Regex = 1,
+        Ext = 2
     }
 
     [Serializable]
@@ -56,11 +53,10 @@ namespace PresetKit
         [SerializeField]
         public Preset preset;
 
-        [SerializeField]
-        public string regex;
+        public EMatchType type;
 
         [SerializeField]
-        public AssetType extension;
+        public string pattern;
 
         public bool IsMatch(AssetImporter importer)
         {
@@ -68,15 +64,14 @@ namespace PresetKit
             string assetName = Path.GetFileName(assetPath);
             string assetExt = Path.GetExtension(assetPath);
 
-            if (!string.IsNullOrEmpty(regex))
+            if(type == EMatchType.Regex)
             {
-                Regex reg = new Regex(regex);
+                Regex reg = new Regex(pattern);
                 return reg.IsMatch(assetName);
             }
             else
             {
-                string ext = GetExtension(extension);
-                return ext.Equals(assetExt);
+                return assetExt.Equals(pattern);
             }
         }
 
@@ -91,24 +86,6 @@ namespace PresetKit
             {
                 preset.ApplyTo(importer);
             }
-        }
-
-        static string GetExtension(AssetType type)
-        {
-            string ext = string.Empty;
-            switch (type)
-            {
-                case AssetType.Png:
-                    ext = ".png";
-                    break;
-                case AssetType.Jpg:
-                    ext = ".jpg";
-                    break;
-                case AssetType.Prefab:
-                    ext = ".prefab";
-                    break;
-            }
-            return ext;
         }
     }
 }

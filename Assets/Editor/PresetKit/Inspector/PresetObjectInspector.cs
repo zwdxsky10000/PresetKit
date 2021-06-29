@@ -8,13 +8,11 @@ namespace PresetKit
     public class PresetObjectInspector : Editor
     {
         private SerializedProperty pathProperty;
-        private SerializedProperty recursiveProperty;
         private ReorderableList presetReorderableList;
 
         private void OnEnable()
         {
             pathProperty = serializedObject.FindProperty("path");
-            recursiveProperty = serializedObject.FindProperty("recursive");
             InitPresetGUI();
         }
 
@@ -54,8 +52,8 @@ namespace PresetKit
                 var element = l.serializedProperty.GetArrayElementAtIndex(index);
 
                 element.FindPropertyRelative("preset").objectReferenceValue = null;
-                element.FindPropertyRelative("regex").stringValue = string.Empty;
-                element.FindPropertyRelative("extension").stringValue = string.Empty;
+                element.FindPropertyRelative("type").enumValueIndex = (int)EMatchType.Regex;
+                element.FindPropertyRelative("pattern").stringValue = string.Empty;
 
                 serializedObject.ApplyModifiedProperties();
             };
@@ -80,16 +78,16 @@ namespace PresetKit
                 new Rect(rect.x + 45, rect.y, 160, EditorGUIUtility.singleLineHeight),
                 preset, GUIContent.none);
 
-            SerializedProperty regex = element.FindPropertyRelative("regex");
-            EditorGUI.LabelField(new Rect(rect.x + 215, rect.y, 40, EditorGUIUtility.singleLineHeight), new GUIContent("Regex"), EditorStyles.boldLabel);
+            SerializedProperty regex = element.FindPropertyRelative("type");
+            EditorGUI.LabelField(new Rect(rect.x + 215, rect.y, 40, EditorGUIUtility.singleLineHeight), new GUIContent("Type"), EditorStyles.boldLabel);
             EditorGUI.PropertyField(
-                new Rect(rect.x + 260, rect.y, rect.width - 355, EditorGUIUtility.singleLineHeight),
+                new Rect(rect.x + 260, rect.y, 80, EditorGUIUtility.singleLineHeight),
                 regex, GUIContent.none);
 
-            SerializedProperty ext = element.FindPropertyRelative("extension");
-            EditorGUI.LabelField(new Rect(rect.x + rect.width - 90, rect.y, 30, EditorGUIUtility.singleLineHeight), new GUIContent("Ext"), EditorStyles.boldLabel);
+            SerializedProperty ext = element.FindPropertyRelative("pattern");
+            EditorGUI.LabelField(new Rect(rect.x + 355, rect.y, 80, EditorGUIUtility.singleLineHeight), new GUIContent("Pattern"), EditorStyles.boldLabel);
             EditorGUI.PropertyField(
-                new Rect(rect.x + rect.width - 60, rect.y, 60, EditorGUIUtility.singleLineHeight),
+                new Rect(rect.x + 450, rect.y, rect.width - 440, EditorGUIUtility.singleLineHeight),
                 ext, GUIContent.none);
         }
 
@@ -99,8 +97,6 @@ namespace PresetKit
             serializedObject.Update();
 
             EditorGUILayout.PropertyField(pathProperty);
-
-            EditorGUILayout.PropertyField(recursiveProperty);
 
             //绘制ruleList
             presetReorderableList.DoLayoutList();
