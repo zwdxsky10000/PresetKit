@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using UnityEditor;
-using UnityEngine;
 
 namespace PresetKit
 {
@@ -13,24 +12,15 @@ namespace PresetKit
 
         static PresetObject SearchRecursive(string path)
         {
-            foreach (var findAsset in AssetDatabase.FindAssets("t:PresetRule", new[] { Path.GetDirectoryName(path) }))
+            string[] guids = AssetDatabase.FindAssets("t:PresetObject", new[] { Path.GetDirectoryName(path) });
+            if(guids != null && guids.Length > 0)
             {
-                var p = Path.GetDirectoryName(AssetDatabase.GUIDToAssetPath(findAsset));
-                if (p == Path.GetDirectoryName(path))
+                foreach (var guid in guids)
                 {
-                    //Debug.Log("Found AssetRule for Asset Rule" + AssetDatabase.GUIDToAssetPath(findAsset));
-                    return AssetDatabase.LoadAssetAtPath<PresetObject>(AssetDatabase.GUIDToAssetPath(findAsset));
+                    var p = AssetDatabase.GUIDToAssetPath(guid);
+                    return AssetDatabase.LoadAssetAtPath<PresetObject>(p);
                 }
             }
-
-            //no match so go up a level
-            path = Directory.GetParent(path).FullName;
-            path = path.Replace('\\', '/');
-            path = path.Remove(0, Application.dataPath.Length);
-            path = path.Insert(0, "Assets");
-            if (path != "Assets")
-                return SearchRecursive(path);
-
             //no matches
             return null;
         }
@@ -59,16 +49,6 @@ namespace PresetKit
 
         public static void OnPostprocessAllAssets(string[] importedAsset, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
         {
-            foreach (string str in importedAsset)
-            {
-                //Debug.Log("importedAsset = " + str);
-            }
-
-            foreach (string str in deletedAssets)
-            {
-                Debug.Log("deletedAssets = " + str);
-            }
-
             foreach (string str in movedAssets)
             {
                 AssetImporter assetImporter = AssetImporter.GetAtPath(str);
@@ -79,11 +59,6 @@ namespace PresetKit
                     return;
                 }
                 rule.Apply(assetImporter);
-            }
-
-            foreach (string str in movedFromAssetPaths)
-            {
-                Debug.Log("movedFromAssetPaths = " + str);
             }
         }
     }

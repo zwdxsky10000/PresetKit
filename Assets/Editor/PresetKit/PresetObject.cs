@@ -43,8 +43,8 @@ namespace PresetKit
 
     public enum EMatchType
     {
-        Regex = 1,
-        Ext = 2
+        Regex = 0,
+        Extension = 1
     }
 
     [Serializable]

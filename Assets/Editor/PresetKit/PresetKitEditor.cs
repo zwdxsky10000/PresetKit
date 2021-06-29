@@ -2,6 +2,7 @@
 using UnityEditor;
 using UnityEditor.Presets;
 using UnityEngine;
+using System.IO;
 
 namespace PresetKit
 {
@@ -127,7 +128,18 @@ namespace PresetKit
             GUI.color = Color.green;
             if (GUILayout.Button("Reimport"))
             {
-                AssetDatabase.ImportAsset(rule.path, ImportAssetOptions.DontDownloadFromCacheServer | ImportAssetOptions.ImportRecursive);
+                string[] files = Directory.GetFiles(rule.path);
+                if(files != null && files.Length > 0)
+                {
+                    foreach(string file in files)
+                    {
+                        if (file.Contains("PresetRule") || file.Contains(".meta"))
+                        {
+                            continue;
+                        }
+                        AssetDatabase.ImportAsset(file, ImportAssetOptions.DontDownloadFromCacheServer | ImportAssetOptions.ImportRecursive);
+                    }
+                }
             }
             GUI.color = origin;
             EditorGUILayout.EndVertical();
@@ -148,7 +160,7 @@ namespace PresetKit
         private List<PresetObject> GetPresetRules()
         {
             List<PresetObject> rules = new List<PresetObject>();
-            string[] guids = AssetDatabase.FindAssets("t:PresetRule");
+            string[] guids = AssetDatabase.FindAssets("t:PresetObject");
             foreach (var guid in guids)
             {
                 string path = AssetDatabase.GUIDToAssetPath(guid);

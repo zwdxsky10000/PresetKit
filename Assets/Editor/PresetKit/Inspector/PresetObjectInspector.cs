@@ -9,6 +9,7 @@ namespace PresetKit
     {
         private SerializedProperty pathProperty;
         private ReorderableList presetReorderableList;
+        private Vector2 position;
 
         private void OnEnable()
         {
@@ -19,7 +20,8 @@ namespace PresetKit
         private void InitPresetGUI()
         {
             var presetsProp = serializedObject.FindProperty("rules");
-            presetReorderableList = new ReorderableList(serializedObject, presetsProp, false, true, true, true);
+            presetReorderableList = new ReorderableList(serializedObject, presetsProp, true, true, true, true);
+            presetReorderableList.elementHeight = 70;
 
             //绘制Header
             presetReorderableList.drawHeaderCallback = (rect) =>
@@ -32,7 +34,7 @@ namespace PresetKit
             {
                 if (Event.current.type == EventType.Repaint)
                 {
-                    EditorStyles.miniButton.Draw(rect, false, isActive, isFocused, false);
+                    EditorStyles.helpBox.Draw(rect, false, isActive, isFocused, false);
                 }
             };
 
@@ -40,8 +42,9 @@ namespace PresetKit
             presetReorderableList.drawElementCallback = (rect, index, isActive, isFocused) =>
             {
                 var element = presetsProp.GetArrayElementAtIndex(index);
-                DrawPresetRuleElement(element, rect);
-                rect.y += 5;
+                rect.height -= 4;
+                rect.y += 3;
+                EditorGUI.PropertyField(rect, element);
             };
 
             presetReorderableList.onAddCallback = (ReorderableList l) =>
@@ -69,41 +72,23 @@ namespace PresetKit
             };
         }
 
-        private void DrawPresetRuleElement(SerializedProperty element, Rect rect)
-        {
-
-            SerializedProperty preset = element.FindPropertyRelative("preset");
-            EditorGUI.LabelField(new Rect(rect.x, rect.y, 40, EditorGUIUtility.singleLineHeight), new GUIContent("Preset"), EditorStyles.boldLabel);
-            EditorGUI.PropertyField(
-                new Rect(rect.x + 45, rect.y, 160, EditorGUIUtility.singleLineHeight),
-                preset, GUIContent.none);
-
-            SerializedProperty regex = element.FindPropertyRelative("type");
-            EditorGUI.LabelField(new Rect(rect.x + 215, rect.y, 40, EditorGUIUtility.singleLineHeight), new GUIContent("Type"), EditorStyles.boldLabel);
-            EditorGUI.PropertyField(
-                new Rect(rect.x + 260, rect.y, 80, EditorGUIUtility.singleLineHeight),
-                regex, GUIContent.none);
-
-            SerializedProperty ext = element.FindPropertyRelative("pattern");
-            EditorGUI.LabelField(new Rect(rect.x + 355, rect.y, 80, EditorGUIUtility.singleLineHeight), new GUIContent("Pattern"), EditorStyles.boldLabel);
-            EditorGUI.PropertyField(
-                new Rect(rect.x + 450, rect.y, rect.width - 440, EditorGUIUtility.singleLineHeight),
-                ext, GUIContent.none);
-        }
-
         public override void OnInspectorGUI()
         {
-            //绘制reorderableList
             serializedObject.Update();
 
-            EditorGUILayout.PropertyField(pathProperty);
+            position = EditorGUILayout.BeginScrollView(position);
 
-            //绘制ruleList
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Path:",GUILayout.MaxWidth(35f));
+            pathProperty.stringValue = EditorGUILayout.TextField(pathProperty.stringValue);
+            EditorGUILayout.EndHorizontal();
+            
+
             presetReorderableList.DoLayoutList();
+            EditorGUILayout.EndScrollView();
 
             serializedObject.ApplyModifiedProperties();
         }
     }
-
 }
 
