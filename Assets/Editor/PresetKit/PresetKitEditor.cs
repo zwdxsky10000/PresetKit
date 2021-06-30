@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEditor.Presets;
 using UnityEngine;
 using System.IO;
+using UnityEditor.IMGUI.Controls;
 
 namespace PresetKit
 {
@@ -59,32 +60,42 @@ namespace PresetKit
             }
             s_Instance.minSize = new Vector2(480, 500);
             s_Instance.maxSize = new Vector2(480, 500);
+            s_Instance.titleContent = new GUIContent("PresetKit");
             s_Instance.Show();
         }
 
         private Vector2 pos;
-        private List<PresetObject> m_AssetPresetList;
+        [SerializeField] 
+        TreeViewState m_TreeViewState;
+        RuleTreeView m_RuleTreeView;
 
         private void OnEnable()
         {
-            m_AssetPresetList = GetPresetRules();
+            if (m_TreeViewState == null)
+                m_TreeViewState = new TreeViewState();
+
+            m_RuleTreeView = new RuleTreeView(m_TreeViewState);
         }
 
         private void OnGUI()
         {
-            if (m_AssetPresetList == null || m_AssetPresetList.Count == 0)
-            {
-                DrawEmpty();
-            }
-            else
-            {
-                DrawRules();
-            }
+            DoTreeView();
+            
+        }
+
+        void DoTreeView()
+        {
+            m_RuleTreeView.OnGUI(new Rect(0, 0, 120, position.height));
         }
 
         private void OnFocus()
         {
-            m_AssetPresetList = GetPresetRules();
+            
+        }
+
+        private void DrawRule()
+        {
+
         }
 
         private void DrawEmpty()
@@ -92,18 +103,8 @@ namespace PresetKit
             EditorGUILayout.HelpBox("", MessageType.Info);
         }
 
-        private void DrawRules()
-        {
-            pos = EditorGUILayout.BeginScrollView(pos);
-            foreach (var rule in m_AssetPresetList)
-            {
-                DrawRule(rule);
-            }
-            EditorGUILayout.EndScrollView();
-        }
-
         bool foldout = false;
-        private void DrawRule(PresetObject rule)
+        private void DrawRuleDetail(PresetObject rule)
         {
             EditorGUILayout.BeginVertical("box");
 
@@ -155,6 +156,62 @@ namespace PresetKit
             EditorGUILayout.LabelField("Ext:", GUILayout.Width(25));
             rule.pattern = EditorGUILayout.TextField(rule.pattern, GUILayout.Width(70));
             EditorGUILayout.EndHorizontal();
+        }
+
+        private List<PresetObject> GetPresetRules()
+        {
+            List<PresetObject> rules = new List<PresetObject>();
+            string[] guids = AssetDatabase.FindAssets("t:PresetObject");
+            foreach (var guid in guids)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                PresetObject rule = AssetDatabase.LoadAssetAtPath<PresetObject>(path);
+                rules.Add(rule);
+            }
+            return rules;
+        }
+    }
+
+    class RuleTreeView : TreeView
+    {
+        SearchField m_searchField;
+
+        public RuleTreeView(TreeViewState treeViewState)
+            : base(treeViewState)
+        {
+            m_searchField = new SearchField();
+            // 对TreeView进行一些设置
+            rowHeight = 20;
+            showBorder = true;
+
+            Reload();
+        }
+
+        public override void OnGUI(Rect rect)
+        {
+            Rect srect = rect;
+            srect.height = 18f;
+            searchString = m_searchField.OnGUI(rect, searchString);
+
+            rect.y += 18f;
+            base.OnGUI(rect);
+        }
+
+        protected override TreeViewItem BuildRoot()
+        {
+            var root = new TreeViewItem { id = 0, depth = -1, displayName = "Root" };
+
+            var ruleObjects = GetPresetRules();
+            var allItems = new List<TreeViewItem>();
+            for (int i = 0, len = ruleObjects.Count; i < len; ++i)
+            {
+                var item = new TreeViewItem { id = i + 1, depth = 0, displayName = ruleObjects[i].name };
+                allItems.Add(item);
+            }
+
+            SetupParentsAndChildrenFromDepths(root, allItems);
+
+            return root;
         }
 
         private List<PresetObject> GetPresetRules()
