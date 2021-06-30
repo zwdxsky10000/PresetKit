@@ -58,8 +58,7 @@ namespace PresetKit
             {
                 s_Instance = EditorWindow.GetWindow<PresetKitEditor>();
             }
-            s_Instance.minSize = new Vector2(480, 500);
-            s_Instance.maxSize = new Vector2(480, 500);
+            s_Instance.minSize = new Vector2(560, 500);
             s_Instance.titleContent = new GUIContent("PresetKit");
             s_Instance.Show();
         }
@@ -80,12 +79,12 @@ namespace PresetKit
         private void OnGUI()
         {
             DoTreeView();
-            
+            DrawDetail();
         }
 
         void DoTreeView()
         {
-            m_RuleTreeView.OnGUI(new Rect(0, 0, 120, position.height));
+            m_RuleTreeView.OnGUI(new Rect(5, 5, 120, position.height-5));
         }
 
         private void OnFocus()
@@ -93,14 +92,23 @@ namespace PresetKit
             
         }
 
-        private void DrawRule()
+        private void DrawDetail()
         {
-
+            Rect rect = new Rect(130, 5, position.width - 135, position.height-5);
+            if(true)
+            {
+                rect.height = 30f;
+                DrawEmpty(rect);
+            }
+            else
+            {
+                DrawRuleDetail(null);
+            }
         }
 
-        private void DrawEmpty()
+        private void DrawEmpty(Rect rect)
         {
-            EditorGUILayout.HelpBox("", MessageType.Info);
+            EditorGUI.HelpBox(rect, "empty", MessageType.Info);
         }
 
         bool foldout = false;
@@ -191,7 +199,7 @@ namespace PresetKit
         {
             Rect srect = rect;
             srect.height = 18f;
-            searchString = m_searchField.OnGUI(rect, searchString);
+            searchString = m_searchField.OnGUI(srect, searchString);
 
             rect.y += 18f;
             base.OnGUI(rect);
