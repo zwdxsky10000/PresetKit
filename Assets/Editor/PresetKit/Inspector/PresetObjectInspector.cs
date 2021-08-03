@@ -86,7 +86,14 @@ namespace PresetKit
 
             presetReorderableList.DoLayoutList();
             EditorGUILayout.EndScrollView();
-
+            Color origin = GUI.color;
+            GUI.color = Color.green;
+            if (GUILayout.Button("Reimporter"))
+            {
+                AssetDatabase.ImportAsset(pathProperty.stringValue, 
+                    ImportAssetOptions.ForceUpdate | ImportAssetOptions.DontDownloadFromCacheServer);
+            }
+            GUI.color = origin;
             serializedObject.ApplyModifiedProperties();
         }
     }
