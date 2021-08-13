@@ -6,8 +6,8 @@
     xsi:noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd"
 >
     
-    <engine:VisualElement name="container">
-        <!--><engine:Label text="Hello World! From UXML" /><!-->
+    <engine:VisualElement name="Container">
+        
         <engine:VisualElement name="LeftPanel">
             <engine:VisualElement name="MenuBar">
                 
@@ -18,12 +18,13 @@
 
         <engine:VisualElement name="RightPanel">
             <engine:VisualElement name="RightTopPanel">
-                
+                <engine:Label text="Hello World! From UXML" />
             </engine:VisualElement>
             
             <engine:VisualElement name="RightBottomPanel">
                 
             </engine:VisualElement>
         </engine:VisualElement>
+
     </engine:VisualElement>
 </engine:UXML>

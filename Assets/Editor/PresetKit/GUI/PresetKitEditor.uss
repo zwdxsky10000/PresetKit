@@ -1,0 +1,49 @@
+Label {
+    font-size: 20px;
+    -unity-font-style: bold;
+    color: rgb(68, 138, 255);
+}
+
+#Container {
+    display: flex;
+    flex-direction: row;
+    width: auto;
+	align-items: stretch;
+}
+
+#LeftPanel 
+{
+	display: flex;
+	-unity-text-align: middle-center;
+	flex: 1;
+	width: auto;
+	border-width: 2px;
+	border-color: rgba(21, 132, 67,1);
+}
+
+#RightPanel 
+{
+	position: relative;
+	flex: 1;
+	width: auto;
+	border-width: 2px;
+	border-color: rgba(21, 132, 67,1);
+}
+
+#RightTopPanel 
+{
+	border-width: 1px;
+	border-color: rgba(21, 132, 67,1);
+	-unity-text-align: middle-center;
+	display: flex;
+	flex: 1;
+}
+
+#RightBottomPanel 
+{
+	border-width: 1px;
+	border-color: rgba(21, 132, 67,1);
+	-unity-text-align: middle-center;
+	display: flex;
+	flex: 1;
+}
