@@ -9,7 +9,7 @@ Assets/AssetStoreTools*
 # Visual Studio cache directory
 .vs/
 .vscode/
-.vsconfg
+.vsconfig
 
 # Rider cache directory
 .idea/
