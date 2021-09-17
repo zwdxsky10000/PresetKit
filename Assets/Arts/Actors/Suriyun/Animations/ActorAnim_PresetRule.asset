@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   path: Assets/Arts/Actors/Suriyun/Animations
   rules:
-  - preset: {fileID: 2655988077585873504, guid: c6c458fda04f25649a726e5fecae1459, type: 2}
+  - preset: {fileID: 2655988077585873504, guid: 415c2cfe8429b65429180d1aa4c12098, type: 2}
     type: 1
     pattern: .fbx

@@ -12,7 +12,7 @@ namespace PresetKit
 
         static PresetObject SearchRecursive(string path)
         {
-            string[] guids = AssetDatabase.FindAssets("t:PresetObject", new[] { Path.GetDirectoryName(path).Replace('\\','/') });
+            string[] guids = AssetDatabase.FindAssets("t:PresetObject", new[] { Path.GetDirectoryName(path)});
             if(guids != null && guids.Length > 0)
             {
                 foreach (var guid in guids)
@@ -25,52 +25,34 @@ namespace PresetKit
             return null;
         }
 
-        private void OnPreprocessTexture()
-        {
-            PresetObject rule = FindRuleForAsset(assetImporter.assetPath);
-
-            if (rule == null)
-            {
-                return;
-            }
-            rule.Apply(assetImporter);
-        }
-
-        private void OnPreprocessModel()
-        {
-            PresetObject rule = FindRuleForAsset(assetImporter.assetPath);
-
-            if (rule == null)
-            {
-                return;
-            }
-            rule.Apply(assetImporter);
-        }
-
-        private void OnPostprocessModel()
-        {
-            PresetObject rule = FindRuleForAsset(assetImporter.assetPath);
-
-            if (rule == null)
-            {
-                return;
-            }
-            rule.Apply(assetImporter);
-        }
-
         public static void OnPostprocessAllAssets(string[] importedAsset, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
         {
+            foreach (string str in importedAsset)
+            {
+                HandleAssets(str);
+            }
+
             foreach (string str in movedAssets)
             {
-                AssetImporter assetImporter = AssetImporter.GetAtPath(str);
-                PresetObject rule = FindRuleForAsset(assetImporter.assetPath);
-
-                if (rule == null)
-                {
-                    return;
-                }
-                rule.Apply(assetImporter);
+                HandleAssets(str);
             }
+        }
+
+        static void HandleAssets(string str)
+        {
+            if (AssetDatabase.IsValidFolder(str))
+            {
+                return;
+            }
+
+            AssetImporter assetImporter = AssetImporter.GetAtPath(str);
+            PresetObject rule = FindRuleForAsset(assetImporter.assetPath);
+
+            if (rule == null)
+            {
+                return;
+            }
+            rule.Apply(assetImporter);
         }
     }
 }

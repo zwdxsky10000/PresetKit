@@ -37,6 +37,10 @@ namespace PresetKit
             {
                 preset.Apply(path, importer);
             }
+            else
+            {
+                Debug.LogWarningFormat("asset not found match rule. path={0}", importer.assetPath);
+            }
         }
     }
 
@@ -79,12 +83,16 @@ namespace PresetKit
         {
             if (preset == null)
             {
-                Debug.LogErrorFormat("This preset is null or empty! path:{0}", path);
+                Debug.LogWarningFormat("This preset is null or empty! path:{0}", path);
                 return;
             }
             if (preset.CanBeAppliedTo(importer))
             {
                 preset.ApplyTo(importer);
+            }
+            else
+            {
+                Debug.LogWarningFormat("preset not apply for asset. path={0}", importer.assetPath);
             }
         }
     }
