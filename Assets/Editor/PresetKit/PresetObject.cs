@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.Presets;
@@ -15,19 +16,9 @@ namespace PresetKit
         [Tooltip("处理规则")]
         public PresetRule[] rules;
 
-        public PresetRule FindMatchRule(AssetImporter importer)
+        private PresetRule FindMatchRule(AssetImporter importer)
         {
-            if (rules != null)
-            {
-                foreach (var rule in rules)
-                {
-                    if (rule.IsMatch(importer))
-                    {
-                        return rule;
-                    }
-                }
-            }
-            return null;
+            return rules?.FirstOrDefault(rule => rule.IsMatch(importer));
         }
 
         public void Apply(AssetImporter importer)

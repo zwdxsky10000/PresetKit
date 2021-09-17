@@ -1,28 +1,22 @@
-﻿using System.IO;
+using System.IO;
+using System.Linq;
 using UnityEditor;
 
 namespace PresetKit
 {
     public class PresetKitPostProcessor : AssetPostprocessor
     {
-        static PresetObject FindRuleForAsset(string path)
+        private static PresetObject FindRuleForAsset(string path)
         {
             return SearchRecursive(path);
         }
 
-        static PresetObject SearchRecursive(string path)
+        private static PresetObject SearchRecursive(string path)
         {
             string[] guids = AssetDatabase.FindAssets("t:PresetObject", new[] { Path.GetDirectoryName(path)});
-            if(guids != null && guids.Length > 0)
-            {
-                foreach (var guid in guids)
-                {
-                    var p = AssetDatabase.GUIDToAssetPath(guid);
-                    return AssetDatabase.LoadAssetAtPath<PresetObject>(p);
-                }
-            }
             //no matches
-            return null;
+            if (guids == null || guids.Length <= 0) return null;
+            return guids.Select(guid => AssetDatabase.GUIDToAssetPath(guid)).Select(p => AssetDatabase.LoadAssetAtPath<PresetObject>(p)).FirstOrDefault();
         }
 
         public static void OnPostprocessAllAssets(string[] importedAsset, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
@@ -38,7 +32,7 @@ namespace PresetKit
             }
         }
 
-        static void HandleAssets(string str)
+        private static void HandleAssets(string str)
         {
             if (AssetDatabase.IsValidFolder(str))
             {

@@ -9,7 +9,7 @@ namespace PresetKit
     public class PresetKitEditor : EditorWindow
     {
         [MenuItem("Assets/Create/PresetKit/Preset", false, 0)]
-        static void CreatePreset()
+        private static void CreatePreset()
         {
             UnityEngine.Object obj = Selection.activeObject;
             string path = AssetDatabase.GetAssetPath(obj);
@@ -32,7 +32,7 @@ namespace PresetKit
         }
 
         [MenuItem("Assets/Create/PresetKit/PresetRule", false, 0)]
-        static void CreatePresetRule()
+        private static void CreatePresetRule()
         {
             UnityEngine.Object obj = Selection.activeObject;
 
@@ -41,7 +41,7 @@ namespace PresetKit
             PresetObject rule = ScriptableObject.CreateInstance<PresetObject>();
             rule.path = dir;
 
-            string saveFile = string.Format("{0}/PresetRule.asset", dir);
+            string saveFile = $"{dir}/PresetRule.asset";
             AssetDatabase.CreateAsset(rule, saveFile);
 
             AssetDatabase.Refresh();
@@ -92,10 +92,7 @@ namespace PresetKit
         {
             pos = EditorGUILayout.BeginScrollView(pos);
             objReorderableList.DoLayoutList();
-            if(presetReorderableList != null)
-            {
-                presetReorderableList.DoLayoutList();
-            }
+            presetReorderableList?.DoLayoutList();
             EditorGUILayout.EndScrollView();
         }
 

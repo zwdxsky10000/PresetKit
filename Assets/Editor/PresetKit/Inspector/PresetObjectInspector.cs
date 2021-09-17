@@ -64,11 +64,10 @@ namespace PresetKit
             //绑定remove事件
             presetReorderableList.onRemoveCallback += (list) =>
             {
-                if (EditorUtility.DisplayDialog("Warning!", "Are you sure you want to delete the wave?", "Yes", "No"))
-                {
-                    ReorderableList.defaultBehaviours.DoRemoveButton(list);
-                    serializedObject.ApplyModifiedProperties();
-                }
+                if (!EditorUtility.DisplayDialog("Warning!", "Are you sure you want to delete the wave?", "Yes",
+                    "No")) return;
+                ReorderableList.defaultBehaviours.DoRemoveButton(list);
+                serializedObject.ApplyModifiedProperties();
             };
         }
 
