@@ -12,7 +12,7 @@ namespace PresetKit
 
         static PresetObject SearchRecursive(string path)
         {
-            string[] guids = AssetDatabase.FindAssets("t:PresetObject", new[] { Path.GetDirectoryName(path) });
+            string[] guids = AssetDatabase.FindAssets("t:PresetObject", new[] { Path.GetDirectoryName(path).Replace('\\','/') });
             if(guids != null && guids.Length > 0)
             {
                 foreach (var guid in guids)
@@ -37,6 +37,17 @@ namespace PresetKit
         }
 
         private void OnPreprocessModel()
+        {
+            PresetObject rule = FindRuleForAsset(assetImporter.assetPath);
+
+            if (rule == null)
+            {
+                return;
+            }
+            rule.Apply(assetImporter);
+        }
+
+        private void OnPostprocessModel()
         {
             PresetObject rule = FindRuleForAsset(assetImporter.assetPath);
 

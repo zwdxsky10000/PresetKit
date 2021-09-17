@@ -91,7 +91,7 @@ namespace PresetKit
             if (GUILayout.Button("Reimporter"))
             {
                 AssetDatabase.ImportAsset(pathProperty.stringValue, 
-                    ImportAssetOptions.ForceUpdate | ImportAssetOptions.DontDownloadFromCacheServer);
+                    ImportAssetOptions.ForceUpdate | ImportAssetOptions.ImportRecursive);
             }
             GUI.color = origin;
             serializedObject.ApplyModifiedProperties();

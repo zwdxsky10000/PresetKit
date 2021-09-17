@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   path: Assets/Arts/Textures
   rules:
-  - preset: {fileID: 2655988077585873504, guid: f607ed0607b5524489aa24cf0edb8b07, type: 2}
-    type: 0
-    pattern: .*_etc
   - preset: {fileID: 2655988077585873504, guid: 6c0572f4a3f47ee4eaeab72c5e4f51f7, type: 2}
     type: 1
     pattern: .png
+  - preset: {fileID: 2655988077585873504, guid: f607ed0607b5524489aa24cf0edb8b07, type: 2}
+    type: 0
+    pattern: .*_etc

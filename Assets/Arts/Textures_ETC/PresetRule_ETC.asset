@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 031a9541e76875f4a9d399810576205c, type: 3}
+  m_Name: PresetRule_ETC
+  m_EditorClassIdentifier: 
+  path: Assets/Arts/Textures_ETC
+  rules:
+  - preset: {fileID: 2655988077585873504, guid: 6c0572f4a3f47ee4eaeab72c5e4f51f7, type: 2}
+    type: 1
+    pattern: .fbx
+  - preset: {fileID: 2655988077585873504, guid: c6c458fda04f25649a726e5fecae1459, type: 2}
+    type: 0
+    pattern: 

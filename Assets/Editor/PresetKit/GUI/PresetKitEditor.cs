@@ -1,16 +1,15 @@
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UIElements;
-using UnityEditor.UIElements;
 using UnityEditor.Presets;
+using System.Collections.Generic;
+using System.IO;
+using UnityEditorInternal;
 
 namespace PresetKit
 {
     public class PresetKitEditor : EditorWindow
     {
-        static PresetKitEditor wnd;
-
-        [MenuItem("Assets/Create/Custom/Preset", false, 0)]
+        [MenuItem("Assets/Create/PresetKit/Preset", false, 0)]
         static void CreatePreset()
         {
             UnityEngine.Object obj = Selection.activeObject;
@@ -25,6 +24,7 @@ namespace PresetKit
                 EditorUtility.DisplayDialog("提示", "请选择一个正确的保存目录", "确定");
                 return;
             }
+
             presetSavePath = FileUtil.GetProjectRelativePath(presetSavePath);
             AssetDatabase.CreateAsset(preset, presetSavePath);
 
@@ -32,7 +32,7 @@ namespace PresetKit
             Debug.LogFormat("创建Preset成功! path={0}", presetSavePath);
         }
 
-        [MenuItem("Assets/Create/Custom/PresetRule", false, 0)]
+        [MenuItem("Assets/Create/PresetKit/PresetRule", false, 0)]
         static void CreatePresetRule()
         {
             UnityEngine.Object obj = Selection.activeObject;
@@ -49,37 +49,132 @@ namespace PresetKit
             Debug.LogFormat("创建PresetRule成功! path={0}", saveFile);
         }
 
-
-        [MenuItem("Window/UI Toolkit/PresetKitEditor")]
+        [MenuItem("GameKits/PresetKitEditor")]
         public static void ShowWindow()
         {
-            wnd = GetWindow<PresetKitEditor>();
+            var wnd = GetWindow<PresetKitEditor>();
             wnd.titleContent = new GUIContent("PresetKitEditor");
+            wnd.minSize = new Vector2(300, 500);
             wnd.Show();
         }
 
-        public void CreateGUI()
+        private List<PresetObject> ruleObjects;
+        private PresetObject selectObj;
+
+        private Vector2 pos;
+        private ReorderableList objReorderableList;
+        private ReorderableList presetReorderableList;
+        private SerializedObject so;
+
+        private void OnEnable()
         {
-            // Each editor window contains a root VisualElement object
-            VisualElement root = rootVisualElement;
+            ruleObjects = new List<PresetObject>();
 
-            // Import UXML
-            var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Editor/PresetKit/GUI/PresetKitEditor.uxml");
-            VisualElement labelFromUXML = visualTree.Instantiate();
-            root.Add(labelFromUXML);
+            string[] guids = AssetDatabase.FindAssets("t:PresetObject");
+            if (guids != null && guids.Length > 0)
+            {
+                foreach (var guid in guids)
+                {
+                    var p = AssetDatabase.GUIDToAssetPath(guid);
+                    var obj = AssetDatabase.LoadAssetAtPath<PresetObject>(p);
+                    if (obj != null)
+                    {
+                        ruleObjects.Add(obj);
+                    }
+                }
+            }
+            selectObj = ruleObjects[0];
 
-            // A stylesheet can be added to a VisualElement.
-            // The style will be applied to the VisualElement and all of its children.
-            var styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>("Assets/Editor/PresetKit/GUI/PresetKitEditor.uss");
-            root.styleSheets.Add(styleSheet);
-
-            //rootVisualElement.Q<VisualElement>("Container").style.height = new
-            //StyleLength(position.height);
+            DrawRuleList();
+            DrawRuleItem();
         }
 
-        void Update()
+        private void OnGUI()
         {
-            Repaint();
+            pos = EditorGUILayout.BeginScrollView(pos);
+            objReorderableList.DoLayoutList();
+            presetReorderableList.DoLayoutList();
+            EditorGUILayout.EndScrollView();
+        }
+
+        private void DrawRuleList()
+        {
+            objReorderableList = new ReorderableList(ruleObjects, typeof(PresetObject), true, true, false, false);
+            objReorderableList.elementHeight = 30;
+
+            //绘制Header
+            objReorderableList.drawHeaderCallback = (rect) =>
+            {
+                EditorGUI.LabelField(rect, "RuleObjects");
+            };
+
+            //绘制背景
+            objReorderableList.drawElementBackgroundCallback = (rect, index, isActive, isFocused) =>
+            {
+                if (Event.current.type == EventType.Repaint)
+                {
+                    rect.x += 2;
+                    rect.width -= 4;
+                    rect.y += 2;
+                    rect.height -= 4;
+                    EditorStyles.helpBox.Draw(rect, false, isActive, isFocused, false);
+                }
+            };
+
+            //绘制元素
+            objReorderableList.drawElementCallback = (rect, index, isActive, isFocused) =>
+            {
+                var element = ruleObjects[index];
+                rect.height -= 4;
+                rect.y += 2;
+
+                EditorGUI.LabelField(rect, element.name);
+            };
+
+            objReorderableList.onSelectCallback = (ReorderableList l) => {
+
+                selectObj = ruleObjects[l.index];
+                if (selectObj != null)
+                    EditorGUIUtility.PingObject(selectObj);
+
+                presetReorderableList.serializedProperty = new SerializedObject(selectObj).FindProperty("rules");
+            };
+        }
+
+        private void DrawRuleItem()
+        {
+            so = new SerializedObject(selectObj);
+            var presetsProp = so.FindProperty("rules");
+            presetReorderableList = new ReorderableList(so, presetsProp, true, true, false, false);
+            presetReorderableList.elementHeight = 70;
+
+            //绘制Header
+            presetReorderableList.drawHeaderCallback = (rect) =>
+            {
+                EditorGUI.LabelField(rect, "Rules");
+            };
+
+            //绘制背景
+            presetReorderableList.drawElementBackgroundCallback = (rect, index, isActive, isFocused) =>
+            {
+                if (Event.current.type == EventType.Repaint)
+                {
+                    rect.x += 2;
+                    rect.width -= 4;
+                    rect.y += 2;
+                    rect.height -= 4;
+                    EditorStyles.helpBox.Draw(rect, false, isActive, isFocused, false);
+                }
+            };
+
+            //绘制元素
+            presetReorderableList.drawElementCallback = (rect, index, isActive, isFocused) =>
+            {
+                var element = presetsProp.GetArrayElementAtIndex(index);
+                rect.height -= 4;
+                rect.y += 2;
+                EditorGUI.PropertyField(rect, element);
+            };
         }
     }
 }
