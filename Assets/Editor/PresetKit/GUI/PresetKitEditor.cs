@@ -93,7 +93,10 @@ namespace PresetKit
         {
             pos = EditorGUILayout.BeginScrollView(pos);
             objReorderableList.DoLayoutList();
-            presetReorderableList.DoLayoutList();
+            if(presetReorderableList != null)
+            {
+                presetReorderableList.DoLayoutList();
+            }
             EditorGUILayout.EndScrollView();
         }
 
@@ -105,7 +108,7 @@ namespace PresetKit
             //绘制Header
             objReorderableList.drawHeaderCallback = (rect) =>
             {
-                EditorGUI.LabelField(rect, "RuleObjects");
+                EditorGUI.LabelField(rect, "PresetRuleSets");
             };
 
             //绘制背景
@@ -137,7 +140,7 @@ namespace PresetKit
                 if (selectObj != null)
                     EditorGUIUtility.PingObject(selectObj);
 
-                presetReorderableList.serializedProperty = new SerializedObject(selectObj).FindProperty("rules");
+                DrawRuleItem();
             };
         }
 
@@ -151,7 +154,7 @@ namespace PresetKit
             //绘制Header
             presetReorderableList.drawHeaderCallback = (rect) =>
             {
-                EditorGUI.LabelField(rect, "Rules");
+                EditorGUI.LabelField(rect, "PresetRules");
             };
 
             //绘制背景
